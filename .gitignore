@@ -1,1 +1,8 @@
+# Rust
+target/
+**/*.rs.bk
+Cargo.lock
+
+# Editors
 *.swp
+.vscode

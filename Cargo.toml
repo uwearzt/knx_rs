@@ -1,0 +1,25 @@
+# ------------------------------------------------------------------------------
+# Copyright 2017-2018 by Uwe Arzt mailto:mail@uwe-arzt.de, https://uwe-arzt.de
+# under BSD License, see https://uwe-arzt.de/bsd-license
+# ------------------------------------------------------------------------------
+
+[package]
+name = "knx_rs"
+version = "0.0.1"
+authors = ["Uwe Arzt <mail@uwe-arzt.de>"]
+
+description = "KNX Library"
+
+repository = "https://github.com/uwearzt/knx_rs"
+readme = "README.md"
+
+categories = ["network"]
+keywords = ["KNX", "Network"]
+license = "BSD"
+
+[dependencies]
+byteorder = { version = "*", default-features = false }
+#nom = { version= "4.0.0-beta3", default-features = false }
+nom = { version= "4.0.0-beta3" } 
+enum-primitive-derive = "^0.1"
+num-traits = { version = "*", default-features = false }
