@@ -13,13 +13,13 @@ description = "KNX Library"
 repository = "https://github.com/uwearzt/knx_rs"
 readme = "README.md"
 
-categories = ["network"]
+categories = ["network-programming", "embedded"]
 keywords = ["KNX", "Network"]
-license = "BSD"
+license = "BSD-2-Clause"
 
 [dependencies]
-byteorder = { version = "*", default-features = false }
+byteorder = { version = "1.2.2", default-features = false }
 #nom = { version= "4.0.0-beta3", default-features = false }
-nom = { version= "4.0.0-beta3" } 
-enum-primitive-derive = "^0.1"
-num-traits = { version = "*", default-features = false }
+nom = { version= "4.0.0-beta3" }
+enum-primitive-derive = "0.1.2"
+num-traits = { version = "0.1.43", default-features = false }
