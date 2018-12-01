@@ -16,7 +16,7 @@
 
 [package]
 name = "knx_rs"
-version = "0.0.2"
+version = "0.0.3"
 authors = ["Uwe Arzt <mail@uwe-arzt.de>"]
 
 description = "KNX Library"
@@ -29,8 +29,7 @@ keywords = ["KNX", "Network"]
 license = "Apache-2.0"
 
 [dependencies]
-byteorder = { version = "1.2.2", default-features = false }
-#nom = { version= "4.0.0-beta3", default-features = false }
-nom = { version= "4.0.0-beta3" }
+byteorder = { version = "1.2.7", default-features = false }
+nom = { version= "4.1.1", default-features = false }
 enum-primitive-derive = "0.1.2"
-num-traits = { version = "0.2.2", default-features = false }
+num-traits = { version = "0.2.6", default-features = false }
