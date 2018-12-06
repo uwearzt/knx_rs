@@ -16,7 +16,8 @@
 
 [package]
 name = "knx_rs"
-version = "0.0.3"
+version = "0.0.4"
+edition = "2018"
 authors = ["Uwe Arzt <mail@uwe-arzt.de>"]
 
 description = "KNX Library"

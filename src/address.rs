@@ -77,7 +77,7 @@ impl FromStr for Address {
  );
 
 impl fmt::Display for Address {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self.address_type {
             AddressType::Group => {
                 write!(f, "{}/{}/{}", self.main_group, self.mid_group, self.address)
@@ -89,7 +89,7 @@ impl fmt::Display for Address {
     }
 }
 impl fmt::Debug for Address {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{{ {} }}", self)
     }
 }
@@ -97,8 +97,8 @@ impl fmt::Debug for Address {
 #[cfg(test)]
 mod tests {
 
-    use address::Address;
-    use address::AddressType;
+    use crate::address::Address;
+    use crate::address::AddressType;
     use std::str::FromStr;
 
     #[test]

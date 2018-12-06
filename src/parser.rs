@@ -14,13 +14,13 @@
 // limitations under the License.
 // ------------------------------------------------------------------------------
 
-use address::Address;
-use address::AddressType;
-use cemi::CEMIMessageCode;
-use cemi::CEMI;
-use header::Header;
-use header::ServiceType;
-use imi::IMI;
+use crate::address::Address;
+use crate::address::AddressType;
+use crate::cemi::CEMIMessageCode;
+use crate::cemi::CEMI;
+use crate::header::Header;
+use crate::header::ServiceType;
+use crate::imi::IMI;
 
 use nom::{be_u16, be_u8};
 
@@ -29,8 +29,8 @@ use num_traits::FromPrimitive;
 // ------------------------------------------------------------------------------
 named!(parse_header<&[u8], Header>,
     do_parse!(
-    header_length: be_u8 >>
-    protocol_version: be_u8 >>
+    _header_length: be_u8 >>
+    _protocol_version: be_u8 >>
     service_type: be_u16 >>
     payload_length: be_u16 >>
 
@@ -133,8 +133,8 @@ pub fn parse_imi(bytes: &[u8]) -> IMI {
 // ------------------------------------------------------------------------------
 #[cfg(test)]
 mod tests {
-    use parser::parse_cemi;
-    use parser::parse_imi;
+    use crate::parser::parse_cemi;
+    use crate::parser::parse_imi;
 
     #[test]
     fn t_parse_cemi() {

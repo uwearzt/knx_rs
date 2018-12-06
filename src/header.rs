@@ -83,7 +83,7 @@ impl Header {
 }
 
 impl fmt::Display for Header {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
             "ServiceType: {:?} Length: {}",
@@ -92,7 +92,7 @@ impl fmt::Display for Header {
     }
 }
 impl fmt::Debug for Header {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{{ {} }}", self)
     }
 }
@@ -101,8 +101,8 @@ impl fmt::Debug for Header {
 #[cfg(test)]
 mod tests {
 
-    use header::Header;
-    use header::ServiceType;
+    use crate::header::Header;
+    use crate::header::ServiceType;
     use std::mem::size_of;
 
     #[test]
