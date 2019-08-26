@@ -11,7 +11,9 @@ use crate::header::Header;
 use crate::header::ServiceType;
 use crate::imi::IMI;
 
-use nom::{be_u16, be_u8};
+use nom::{
+  number::complete::{be_u16, be_u8, },
+};
 
 use num_traits::FromPrimitive;
 
@@ -61,24 +63,23 @@ named!(parse_group_address<&[u8], Address >,
         (Address::new(AddressType::Group, x.0, x.1, x.2))
     )
 );
-named!(parse_address<&[u8], (u8, u8, u8) >,
+named!(parse_address<&[u8], (u8, u8, u8)>,
     do_parse!(
-        group: bits!(tuple!(take_bits!(u8, 4), take_bits!(u8, 4))) >>
+        group: bits!(tuple!(
+          take_bits!(4u8),
+          take_bits!(4u8))) >>
         address: be_u8 >>
         (group.0, group.1, address)
     )
 );
 
 // ------------------------------------------------------------------------------
-named!(parse_data<&[u8], (u8, u8) >,
+named!(parse_knx_data<&[u8], (u8, u8)>,
     do_parse!(
-        data_len: be_u8 >>
-        x: bits!(tuple!(
-            take_bits!(u8, 2),
-            take_bits!(u8, 4),
-            take_bits!(u8, 4),
-            take_bits!(u8, 6))) >>
-        ((data_len, x.3))
+      data_len: be_u8 >>
+      _x1: be_u8 >>
+      x2: be_u8 >>
+      (data_len, x2)
     )
 );
 
@@ -91,7 +92,7 @@ named!(cemi<&[u8], (Header, CEMIMessageCode, Address, Address, (u8, u8))>,
         _control_field: parse_control_field >>
         source_address: parse_phys_address >>
         destination_address: parse_group_address >>
-        data: parse_data >>
+        data: parse_knx_data >>
         (ip_header, msg_code, source_address, destination_address, data)
     )
 );
@@ -100,7 +101,7 @@ named!(imi<&[u8], (Address, Address, (u8, u8))>,
         _control_byte: be_u8 >>
         source_address: parse_phys_address >>
         destination_address: parse_group_address >>
-        data: parse_data >>
+        data: parse_knx_data >>
         (source_address, destination_address, data)
     )
 );

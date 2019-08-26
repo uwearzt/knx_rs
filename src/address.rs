@@ -6,7 +6,10 @@
 use std::fmt;
 use std::str::FromStr;
 use std::num::ParseIntError;
-use nom::rest_s;
+
+use nom::{
+    combinator::rest,
+};
 
 #[derive(PartialEq, Eq, Hash)]
 pub struct Address {
@@ -43,7 +46,6 @@ impl Address {
 impl FromStr for Address {
     type Err = ParseIntError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        //let ret = parse(CompleteStr(s)).unwrap();
         let ret = parse(s).unwrap();
         let (main, middle, address) = ret.1;
         println!("############# {} {} {}", main, middle, address);
@@ -56,14 +58,16 @@ impl FromStr for Address {
     }
 }
 
- named!(parse<&str, (&str, &str, &str)>,
+named!(parse<&str, (&str, &str, &str)>,
   do_parse!(
-    main: take_until_and_consume!("/") >>
-    middle: take_until_and_consume!("/") >>
-    address: rest_s >>
+    main: take_until!("/") >>
+    tag!("/") >>
+    middle: take_until!("/") >>
+    tag!("/") >>
+    address: rest >>
     ((&main, &middle, &address))
   )
- );
+);
 
 impl fmt::Display for Address {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
