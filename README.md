@@ -27,7 +27,7 @@ Add `knx_rs` as a dependency in `Cargo.toml`:
 
 ```toml
 [dependencies]
-knx_rs = "0.0.1"
+knx_rs = "0.0.6"
 ```
 
 ### Cross compiling
