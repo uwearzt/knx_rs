@@ -1,10 +1,7 @@
 # knx_rs
 
 [![Apache licensed](https://img.shields.io/badge/license-Apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
-[![Build Status](https://travis-ci.org/uwearzt/knx_rs.svg?branch=master)](https://travis-ci.org/uwearzt/knx_rs)
-
-[![Actions Status](https://github.com/uwearzt/knx_rs/workflows/push_pullreq.yml/badge.svg)](https://github.com/uwearzt/knx_rs/actions)
-
+[![Actions Status](https://github.com/uwearzt/knx_rs/workflows/push_pullreq/badge.svg)](https://github.com/uwearzt/knx_rs/actions)
 [![crates.io](https://meritbadge.herokuapp.com/knx_rs)](https://crates.io/crates/knx_rs)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fuwearzt%2Fknx_rs.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fuwearzt%2Fknx_rs?ref=badge_shield)
 [![Gitter](https://badges.gitter.im/knx_rs/Lobby.svg)](https://gitter.im/knx_rs/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
