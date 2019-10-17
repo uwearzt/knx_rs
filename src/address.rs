@@ -4,12 +4,10 @@
 // ------------------------------------------------------------------------------
 
 use std::fmt;
-use std::str::FromStr;
 use std::num::ParseIntError;
+use std::str::FromStr;
 
-use nom::{
-    combinator::rest,
-};
+use nom::combinator::rest;
 
 #[derive(PartialEq, Eq, Hash)]
 pub struct Address {
@@ -29,10 +27,10 @@ impl Address {
     /// Create an Address
     pub fn new(address_type: AddressType, main_group: u8, mid_group: u8, address: u8) -> Address {
         Address {
-            address_type: address_type,
-            main_group: main_group,
-            mid_group: mid_group,
-            address: address,
+            address_type,
+            main_group,
+            mid_group,
+            address,
         }
     }
     pub fn main(&self) -> u8 {
@@ -51,9 +49,9 @@ impl FromStr for Address {
         println!("############# {} {} {}", main, middle, address);
         Ok(Address::new(
             AddressType::Group,
-             u8::from_str(main).unwrap(),
-             u8::from_str(middle).unwrap(),
-             u8::from_str(address).unwrap(),
+            u8::from_str(main).unwrap(),
+            u8::from_str(middle).unwrap(),
+            u8::from_str(address).unwrap(),
         ))
     }
 }
