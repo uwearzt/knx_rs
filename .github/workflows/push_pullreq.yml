@@ -20,4 +20,4 @@ jobs:
       - name: run test
         uses: actions-rs/cargo@v1
         with:
-          command: check
+          command: test
