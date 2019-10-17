@@ -11,9 +11,7 @@ use crate::header::Header;
 use crate::header::ServiceType;
 use crate::imi::IMI;
 
-use nom::{
-  number::complete::{be_u16, be_u8, },
-};
+use nom::number::complete::{be_u16, be_u8};
 
 use num_traits::FromPrimitive;
 
@@ -181,5 +179,4 @@ mod tests {
         parse_imi(&[0xBC, 0x11, 0x2C, 0x09, 0x33, 0xE1, 0x00, 0x81, 0x24]);
         parse_imi(&[0xBC, 0x11, 0x2C, 0x09, 0x32, 0xE1, 0x00, 0x81, 0x25]);
     }
-
 }
