@@ -5,6 +5,7 @@
 [![crates.io](https://meritbadge.herokuapp.com/knx_rs)](https://crates.io/crates/knx_rs)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fuwearzt%2Fknx_rs.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fuwearzt%2Fknx_rs?ref=badge_shield)
 [![Gitter](https://badges.gitter.im/knx_rs/Lobby.svg)](https://gitter.im/knx_rs/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fuwearzt%2Fknx_rs.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fuwearzt%2Fknx_rs?ref=badge_shield)
 
 The `knx_rs` crate implements a
 [KNX](https://en.wikipedia.org/wiki/KNX_(standard)) Library able to communicate over IP (Multicast) and Serial.
@@ -39,3 +40,6 @@ knx_rs = "0.0.6"
 ## License
 
 [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fuwearzt%2Fknx_rs.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fuwearzt%2Fknx_rs?ref=badge_large)
