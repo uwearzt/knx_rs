@@ -1,5 +1,5 @@
 // ------------------------------------------------------------------------------
-// Copyright 2019 Uwe Arzt, mail@uwe-arzt.de
+// Copyright 2019-2021 Uwe Arzt, mail@uwe-arzt.de
 // SPDX-License-Identifier: Apache-2.0
 // ------------------------------------------------------------------------------
 
@@ -9,11 +9,9 @@
 //#![no_std]
 
 #[macro_use]
-extern crate nom;
-
-#[macro_use]
 extern crate enum_primitive_derive;
-use num_traits;
+
+extern crate nom;
 
 pub mod helper;
 pub mod parser;

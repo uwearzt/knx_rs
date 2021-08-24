@@ -1,13 +1,20 @@
 // ------------------------------------------------------------------------------
-// Copyright 2019 Uwe Arzt, mail@uwe-arzt.de
+// Copyright 2019-2021 Uwe Arzt, mail@uwe-arzt.de
 // SPDX-License-Identifier: Apache-2.0
 // ------------------------------------------------------------------------------
 
+use nom::{
+    branch::alt,
+    bytes::complete::tag,
+    character::complete::{char, one_of},
+    combinator::recognize,
+    multi::{many0, many1},
+    sequence::terminated,
+    IResult,
+};
 use std::fmt;
 use std::num::ParseIntError;
 use std::str::FromStr;
-
-use nom::combinator::rest;
 
 #[derive(PartialEq, Eq, Hash)]
 pub struct Address {
@@ -44,28 +51,11 @@ impl Address {
 impl FromStr for Address {
     type Err = ParseIntError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let ret = parse(s).unwrap();
-        let (main, middle, address) = ret.1;
-        println!("############# {} {} {}", main, middle, address);
-        Ok(Address::new(
-            AddressType::Group,
-            u8::from_str(main).unwrap(),
-            u8::from_str(middle).unwrap(),
-            u8::from_str(address).unwrap(),
-        ))
+        let ret = parse_address(s).unwrap();
+        let (addrtype, main, middle, address) = ret.1;
+        Ok(Address::new(addrtype, main, middle, address))
     }
 }
-
-named!(parse<&str, (&str, &str, &str)>,
-  do_parse!(
-    main: take_until!("/") >>
-    tag!("/") >>
-    middle: take_until!("/") >>
-    tag!("/") >>
-    address: rest >>
-    ((&main, &middle, &address))
-  )
-);
 
 impl fmt::Display for Address {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -85,6 +75,28 @@ impl fmt::Debug for Address {
     }
 }
 
+fn parse_address(input: &str) -> IResult<&str, (AddressType, u8, u8, u8)> {
+    let (i, main) = decimal(input)?;
+    let (i, delim) = alt((tag("/"), tag(".")))(i)?;
+    let (i, middle) = decimal(i)?;
+    let (i, _) = tag(delim)(i)?;
+    let (i, address) = decimal(i)?;
+
+    let main = u8::from_str(main).unwrap();
+    let middle = u8::from_str(middle).unwrap();
+    let address = u8::from_str(address).unwrap();
+
+    if "/" == delim {
+        Ok((i, (AddressType::Group, main, middle, address)))
+    } else {
+        Ok((i, (AddressType::Individual, main, middle, address)))
+    }
+}
+
+fn decimal(input: &str) -> IResult<&str, &str> {
+    recognize(many1(terminated(one_of("0123456789"), many0(char('_')))))(input)
+}
+
 #[cfg(test)]
 mod tests {
 
@@ -93,7 +105,7 @@ mod tests {
     use std::str::FromStr;
 
     #[test]
-    fn t_knx_address() {
+    fn t_knx_group_address() {
         assert_eq!(
             Address::from_str("1/2/3").unwrap(),
             Address::new(AddressType::Group, 1, 2, 3)
@@ -101,6 +113,17 @@ mod tests {
         assert_eq!(
             Address::from_str("15/15/255").unwrap(),
             Address::new(AddressType::Group, 15, 15, 255)
+        );
+    }
+    #[test]
+    fn t_knx_individual_address() {
+        assert_eq!(
+            Address::from_str("2.3.4").unwrap(),
+            Address::new(AddressType::Individual, 2, 3, 4)
+        );
+        assert_eq!(
+            Address::from_str("15.15.255").unwrap(),
+            Address::new(AddressType::Individual, 15, 15, 255)
         );
     }
 }
