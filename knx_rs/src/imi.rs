@@ -1,5 +1,5 @@
 // ------------------------------------------------------------------------------
-// Copyright 2019 Uwe Arzt, mail@uwe-arzt.de
+// Copyright 2021 Uwe Arzt, mail@uwe-arzt.de
 // SPDX-License-Identifier: Apache-2.0
 // ------------------------------------------------------------------------------
 
@@ -85,37 +85,45 @@ pub enum IMIMessageCode {
 /// IMI, entire packet send over KNX TP
 pub struct IMI {}
 
-enum FrameType {
+#[derive(PartialEq, Debug)]
+pub enum FrameType {
     ExtendedFrame = 0x0,
     StandardFrame = 0x1,
 }
-enum RepeatFlag {
+
+#[derive(PartialEq, Debug)]
+pub enum RepeatFlag {
     Repeat = 0x0,
     DoNotRepeat = 0x1,
 }
 
-enum SystemBroadcast {
+#[derive(PartialEq, Debug)]
+pub enum SystemBroadcast {
     SystemBroadcast = 0x0,
     Broadcast = 0x1,
 }
 
-enum Priority {
+#[derive(PartialEq, Debug)]
+pub enum Priority {
     System = 0x0,
     Normal = 0x1,
     Urgent = 0x2,
     Low = 0x3,
 }
 
-enum AcknowledgeRequest {
+#[derive(PartialEq, Debug)]
+pub enum AcknowledgeRequest {
     NoACKRequested = 0x0,
     ACKRequested = 0x1,
 }
 
-enum Confirm {
+#[derive(PartialEq, Debug)]
+pub enum Confirm {
     NoError = 0x0,
     Error = 0x1,
 }
 
-enum ExtendedFrameFormat {
+#[derive(PartialEq, Debug)]
+pub enum ExtendedFrameFormat {
     StandardFrame = 0x0,
 }

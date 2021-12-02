@@ -1,13 +1,11 @@
 // ------------------------------------------------------------------------------
-// Copyright 2019 Uwe Arzt, mail@uwe-arzt.de
+// Copyright 2021 Uwe Arzt, mail@uwe-arzt.de
 // SPDX-License-Identifier: Apache-2.0
 // ------------------------------------------------------------------------------
 
-use std::fmt;
-
-use byteorder::BigEndian;
-use byteorder::ByteOrder;
-use num_traits::ToPrimitive;
+// use byteorder::BigEndian;
+// use byteorder::ByteOrder;
+// use num_traits::ToPrimitive;
 
 const HEADER_LENGTH: u8 = 0x06;
 const KNXNET_VERSION: u8 = 0x10;
@@ -25,25 +23,28 @@ pub enum ServiceType {
     ConnectionstateResponse = 0x0208,
     DisconnectRequest = 0x0209,
     DisconnectResponse = 0x020A,
+    Unknown01 = 0x020B,
     TunnelRequest = 0x0420,
     TunnelResponse = 0x0421,
     DeviceConfigurationRequest = 0x0310,
     DeviceConfigurationAck = 0x0311,
     RoutingIndication = 0x0530,
+    RoutingLostMessage = 0x0531,
+    RoutingBusy = 0x0532,
 }
 
-#[derive(PartialEq)]
-pub struct Header {
+#[derive(PartialEq, Debug)]
+pub struct IPHeader {
     _header_length: u8,
     _knxnet_version: u8,
-    service_type: ServiceType,
-    payload_length: u16,
+    pub service_type: ServiceType,
+    pub payload_length: u16,
 }
 
-impl Header {
+impl IPHeader {
     /// Create an Header
-    pub fn new(service_type: ServiceType, payload_length: u16) -> Header {
-        Header {
+    pub fn new(service_type: ServiceType, payload_length: u16) -> IPHeader {
+        IPHeader {
             _header_length: HEADER_LENGTH,
             _knxnet_version: KNXNET_VERSION,
             service_type: service_type,
@@ -60,29 +61,16 @@ impl Header {
     pub fn knxnet_version() -> u8 {
         KNXNET_VERSION
     }
-    pub fn encode(&self) -> Vec<u8> {
-        let mut buf = vec![self._header_length, self._knxnet_version];
-        let mut tmp = [0, 2];
-        BigEndian::write_u16(&mut tmp, self.service_type.to_u16().unwrap());
-        buf.extend(&tmp);
-        BigEndian::write_u16(&mut tmp, self.payload_length);
-        buf.extend(&tmp);
+    pub fn encode(&self) -> [u8; HEADER_LENGTH as usize] {
+        let mut buf = [0u8; HEADER_LENGTH as usize];
+        buf[0] = HEADER_LENGTH;
+        buf[1] = KNXNET_VERSION;
+        // let mut tmp = [0, 2];
+        // BigEndian::write_u16(&mut tmp, self.service_type.to_u16().unwrap());
+        // buf.extend(&tmp);
+        // BigEndian::write_u16(&mut tmp, self.payload_length);
+        // buf.extend(&tmp);
         buf
-    }
-}
-
-impl fmt::Display for Header {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "ServiceType: {:?} Length: {}",
-            self.service_type, self.payload_length
-        )
-    }
-}
-impl fmt::Debug for Header {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{{ {} }}", self)
     }
 }
 
@@ -90,31 +78,22 @@ impl fmt::Debug for Header {
 #[cfg(test)]
 mod tests {
 
-    use crate::header::Header;
-    use crate::header::ServiceType;
-    use std::mem::size_of;
+    use crate::ipheader::IPHeader;
+    //use crate::header::ServiceType;
 
     #[test]
     fn t_header_length() {
-        assert_eq!(size_of::<Header>(), 0x06);
-        assert_eq!(Header::length(), 0x06);
+        assert_eq!(IPHeader::length(), 0x06);
     }
     #[test]
     fn t_header_version() {
-        assert_eq!(Header::knxnet_version(), 0x10);
+        assert_eq!(IPHeader::knxnet_version(), 0x10);
     }
-    #[test]
-    fn t_header_fmt() {
-        assert_eq!(
-            format!("{}", Header::new(ServiceType::DescriptionRequest, 0x17)),
-            "ServiceType: DescriptionRequest Length: 23"
-        );
-    }
-    #[test]
+    /* #[test]
     fn t_header_encode() {
         assert_eq!(
             Header::new(ServiceType::DescriptionRequest, 0x17).encode(),
             &[0x06, 0x10, 0x02, 0x03, 0x00, 0x17]
         );
-    }
+    } */
 }

@@ -1,0 +1,16 @@
+# ------------------------------------------------------------------------------
+# Copyright 2021 Uwe Arzt, mail@uwe-arzt.de
+# SPDX-License-Identifier: Apache-2.0
+# ------------------------------------------------------------------------------
+
+[package]
+name = "knxproj"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+knx_rs = { path = "../knx_rs" }
+zip = "0.5"
+minidom = "0.13.0"
+log = "0.4.14"
+env_logger = "0.9.0"

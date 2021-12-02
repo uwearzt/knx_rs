@@ -1,0 +1,19 @@
+# ------------------------------------------------------------------------------
+# Copyright 2021 Uwe Arzt, mail@uwe-arzt.de
+# SPDX-License-Identifier: Apache-2.0
+# ------------------------------------------------------------------------------
+
+[package]
+name = "roomsensor"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+knx_rs = { path = "../knx_rs", default-features = false }
+scd4x = { git="https://github.com/aectaan/scd4x-rs.git", branch="dev" }
+# cortex-m = "0.7"
+# cortex-m-rt = "0.6"
+# embedded-hal = "0.2.6"
+linux-embedded-hal = "0.3.2"
+# stm32f4xx-hal = { version = "0.10", features = ["rt", "stm32f411"] }
+# panic-halt = "0.2.0"

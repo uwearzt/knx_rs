@@ -6,3 +6,6 @@ Cargo.lock
 # Editors
 *.swp
 .vscode
+
+# macOS
+.DS_Store
