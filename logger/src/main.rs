@@ -9,14 +9,19 @@ use clap::{App, Arg};
 
 use knx_rs::ipheader::ServiceType;
 use knx_rs::parser::parse_cemi;
-use knx_rs::parser::parse_header;
 use knx_rs::parser::parse_dpt_9;
+use knx_rs::parser::parse_header;
 use knx_rs::parser::parse_serial;
 
 use knxproj::KNXproj;
 
-use env_logger;
-use log::info;
+use log4rs::append::console::ConsoleAppender;
+use log4rs::append::file::FileAppender;
+use log4rs::config::{Appender, Config, Root};
+use log4rs::encode::pattern::PatternEncoder;
+
+use log::LevelFilter;
+use log::{debug, info};
 use serial;
 
 use std::net::Ipv4Addr;
@@ -38,49 +43,68 @@ const SETTINGS: serial::PortSettings = serial::PortSettings {
 
 // ------------------------------------------------------------------------------
 fn main() {
-    env_logger::init();
+    // logging
+    let stdout = ConsoleAppender::builder().build();
+
+    let messages = FileAppender::builder()
+        .encoder(Box::new(PatternEncoder::new("{d} - {m}{n}")))
+        .build("log/messages.log")
+        .unwrap();
+
+    let config = Config::builder()
+        .appender(Appender::builder().build("stdout", Box::new(stdout)))
+        .appender(Appender::builder().build("messages", Box::new(messages)))
+        .build(
+            Root::builder()
+                .appender("stdout")
+                .appender("messages")
+                .build(LevelFilter::Debug),
+        )
+        .unwrap();
+
+    let _handle = log4rs::init_config(config).unwrap();
 
     let parms = App::new("knx_listen")
         .version(crate_version!())
         .about("listen and log KNX messages serial/multicast")
         .author(crate_authors!())
         .arg(
-            Arg::with_name("serial")
+            Arg::new("serial")
                 .required(true)
                 .conflicts_with("multicast")
-                .short("s")
+                .short('s')
                 .long("serial")
                 .help("use serial port"),
         )
         .arg(
-            Arg::with_name("multicast")
+            Arg::new("multicast")
                 .required(true)
                 .conflicts_with("serial")
-                .short("m")
+                .short('m')
                 .long("multicast")
                 .help("use multicast"),
         )
         .arg(
-            Arg::with_name("serialport")
+            Arg::new("serialport")
                 .required(false)
                 .default_value("/dev/cu.usb_to_knx")
-                .short("p")
+                .short('p')
                 .long("serialport")
                 .help("serial port device"),
         )
         .arg(
-            Arg::with_name("multicast_address")
+            Arg::new("multicast_address")
                 .required(false)
                 .default_value("224.0.23.12:3671")
-                .short("a")
+                .short('a')
                 .long("multicast_address")
                 .help("multicast address for knx"),
         )
         .arg(
-            Arg::with_name("knxproj")
+            Arg::new("knxproj")
                 .required(true)
                 .takes_value(true)
-                .short("k")
+                .short('k')
                 .long("knxproj")
                 .help("KNX project file exported from ETS"),
         )
@@ -119,7 +143,7 @@ fn knx_listen_serial(serial_port: &str) {
 
     loop {
         let mut readbuf = [0; 24];
-        
+
         match port.read(&mut readbuf) {
             Ok(nr) => {
                 info!("serial: {:02x?} -> {}", &readbuf[0..nr], nr);
@@ -168,7 +192,6 @@ fn knx_listen_serial(serial_port: &str) {
 
 // ------------------------------------------------------------------------------
 fn knx_listen_multicast(multicast_address: &str, knxproj: Option<KNXproj>) {
-
     let knxproj = knxproj.unwrap();
 
     let knx_addr: SocketAddrV4 = multicast_address.parse().unwrap();
@@ -192,7 +215,7 @@ fn knx_listen_multicast(multicast_address: &str, knxproj: Option<KNXproj>) {
         match hdr.service_type {
             ServiceType::RoutingIndication => {
                 // info!("-----------------------------------------------------------");
-                // info!("msg: {} -> {:02x?}", nr_bytes, &buf[0..nr_bytes]);
+                debug!("msg: {} -> {:02x?}", nr_bytes, &buf[0..nr_bytes]);
 
                 let (bytes, cemi) = parse_cemi(&bytes).unwrap();
 
@@ -201,15 +224,33 @@ fn knx_listen_multicast(multicast_address: &str, knxproj: Option<KNXproj>) {
                 match cemi.data_len {
                     1 => {
                         if cemi.apci == 0x80 {
-                            info!("{:?} -> off", knxproj.group_adresses.get(&cemi.dest_address.as_u16()).unwrap());
-
+                            info!(
+                                "{:?} -> off",
+                                knxproj
+                                    .group_adresses
+                                    .get(&cemi.dest_address.as_u16())
+                                    .unwrap()
+                            );
                         } else {
-                            info!("{:?} -> on", knxproj.group_adresses.get(&cemi.dest_address.as_u16()).unwrap());
+                            info!(
+                                "{:?} -> on",
+                                knxproj
+                                    .group_adresses
+                                    .get(&cemi.dest_address.as_u16())
+                                    .unwrap()
+                            );
                         }
                     }
                     3 => {
                         let (_x, value) = parse_dpt_9(bytes).unwrap();
-                        info!("{:?} -> {}", knxproj.group_adresses.get(&cemi.dest_address.as_u16()).unwrap(), value);
+                        info!(
+                            "{:?} -> {}",
+                            knxproj
+                                .group_adresses
+                                .get(&cemi.dest_address.as_u16())
+                                .unwrap(),
+                            value
+                        );
                     }
                     _ => {
                         info!("no data");

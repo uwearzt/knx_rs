@@ -3,6 +3,9 @@ target/
 **/*.rs.bk
 Cargo.lock
 
+# Logfiles
+*.log
+
 # Editors
 *.swp
 .vscode
