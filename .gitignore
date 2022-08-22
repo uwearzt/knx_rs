@@ -1,10 +1,12 @@
 # Rust
 target/
+bin/
 **/*.rs.bk
 Cargo.lock
 
 # Logfiles
 *.log
+nohup.out
 
 # Editors
 *.swp

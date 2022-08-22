@@ -6,12 +6,12 @@
 use knx_rs::address::Address;
 use knx_rs::dpt::DatapointType;
 use minidom::Element;
+use std::fmt;
 use std::fs::File;
 use std::io::Read;
 use std::str::FromStr;
 
 use std::collections::HashMap;
-
 
 #[derive(PartialEq, Debug)]
 pub struct GroupAddress {
@@ -19,11 +19,15 @@ pub struct GroupAddress {
     name: String,
     dpt: knx_rs::dpt::DatapointType,
 }
+impl fmt::Display for GroupAddress {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} \t {} {}", self.address, self.name, self.dpt)
+    }
+}
 #[derive(Debug, PartialEq)]
 pub struct KNXproj {
     pub group_adresses: HashMap<u16, GroupAddress>,
 }
-
 
 pub fn load_knxproj(file: &str) -> Result<KNXproj, u8> {
     let fname = std::path::Path::new(file);
@@ -41,9 +45,10 @@ pub fn load_knxproj(file: &str) -> Result<KNXproj, u8> {
     };
     println!("{}", file.name());
 
-    let mut knxproj = KNXproj { group_adresses: HashMap::new(), };
+    let mut knxproj = KNXproj {
+        group_adresses: HashMap::new(),
+    };
     // let mut map = HashMap::new();
-
 
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
@@ -119,11 +124,4 @@ pub fn load_knxproj(file: &str) -> Result<KNXproj, u8> {
     Ok(knxproj)
 }
 #[cfg(test)]
-mod tests {
-    use crate::load_knxproj;
-
-    #[test]
-    fn load_test() {
-        load_knxproj("/Users/uwe/tmp/Haus.knxproj").unwrap();
-    }
-}
+mod tests {}

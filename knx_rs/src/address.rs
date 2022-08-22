@@ -45,15 +45,15 @@ impl Address {
     pub fn from_parts(address_type: AddressType, main: u8, middle: u8, address: u8) -> Address {
         Address {
             address_type,
-            address: (main as u16) << 12 | (middle as u16) << 8 | address as u16,
+            address: (main as u16) << 11 | (middle as u16) << 8 | address as u16,
         }
     }
 
     pub fn main(&self) -> u8 {
-        ((self.address & 0b_1111_0000_0000_0000) >> 12) as u8
+        ((self.address & 0b_1111_1000_0000_0000) >> 11) as u8
     }
     pub fn middle(&self) -> u8 {
-         ((self.address & 0b_0000_1111_0000_0000) >> 8)  as u8
+        ((self.address & 0b_0000_0111_0000_0000) >> 8) as u8
     }
     pub fn address(&self) -> u8 {
         (self.address & 0b_0000_0000_1111_1111) as u8
@@ -64,7 +64,7 @@ impl Address {
     }
     pub fn encode(&self) -> [u8; 2] {
         let mut buf = [0u8; 2];
-        buf[0] = self.main() << 4 | self.middle();
+        buf[0] = self.main() << 3 | self.middle();
         buf[1] = self.address();
         buf
     }
@@ -75,8 +75,7 @@ fn parse_bin_address(input: &[u8]) -> IResult<&[u8], u16> {
     let (i, main_middle) = be_u8(input)?;
     let (i, address) = be_u8(i)?;
 
-    Ok((&i, 
-        (main_middle as u16) << 8 | address as u16))
+    Ok((&i, (main_middle as u16) << 8 | address as u16))
 }
 pub fn parse_phys_address(input: &[u8]) -> IResult<&[u8], Address> {
     let (i, addr) = parse_bin_address(input)?;
@@ -102,10 +101,10 @@ impl fmt::Display for Address {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self.address_type {
             AddressType::Group => {
-                write!(f, "{}/{}/{} ({})", self.main(), self.middle(), self.address(), self.address)
+                write!(f, "{}/{}/{}", self.main(), self.middle(), self.address())
             }
             AddressType::Individual => {
-                write!(f, "{}.{}.{} ({})", self.main(), self.middle(), self.address(), self.address)
+                write!(f, "{}.{}.{}", self.main(), self.middle(), self.address())
             }
         }
     }
@@ -144,18 +143,19 @@ fn decimal(input: &str) -> IResult<&str, &str> {
 #[cfg(test)]
 mod tests {
 
-    #[cfg(feature = "std")]
-    use crate::address::parse_group_address;
     use crate::address::Address;
     use crate::address::AddressType;
+
+    #[cfg(feature = "std")]
+    use crate::address::parse_group_address;
     #[cfg(feature = "std")]
     use std::str::FromStr;
 
     #[test]
     fn t_knx_group_address() {
-        let ga01 = Address::new(AddressType::Group, 0x1203);
-        assert_eq!(ga01.encode(), [0x12, 0x03]);
-        assert_eq!(ga01.as_u16(), 4611);
+        let ga01 = Address::new(AddressType::Group, 0x3114);
+        assert_eq!(ga01.encode(), [0x31, 0x14]);
+        assert_eq!(ga01.as_u16(), 12564);
 
         let ga02 = Address::new(AddressType::Group, 0xffff);
         assert_eq!(ga02.encode(), [0xff, 0xff]);
@@ -164,15 +164,15 @@ mod tests {
     #[test]
     #[cfg(feature = "std")]
     fn t_knx_group_address_string() {
-        let (_, ga01) = parse_group_address(&[0x12, 0x03]).unwrap();
-        assert_eq!(ga01, Address::from_parts(AddressType::Group, 1, 2, 3));
-        assert_eq!(ga01, Address::from_str("1/2/3").unwrap());
-        assert_eq!(format!("{}", ga01), "1/2/3 (4611)");
+        let (_, ga01) = parse_group_address(&[0x31, 0x14]).unwrap();
+        assert_eq!(ga01, Address::from_parts(AddressType::Group, 6, 1, 20));
+        assert_eq!(ga01, Address::from_str("6/1/20").unwrap());
+        assert_eq!(format!("{}", ga01), "6/1/20");
 
-        let (_, ga02) = parse_group_address(&[0xff, 0xff]).unwrap();
-        assert_eq!(ga02, Address::from_parts(AddressType::Group, 15, 15, 255));
-        assert_eq!(ga02, Address::from_str("15/15/255").unwrap());
-        assert_eq!(format!("{}", ga02), "15/15/255 (65535)");
+        let (_, ga02) = parse_group_address(&[0x7f, 0xff]).unwrap();
+        assert_eq!(ga02, Address::from_parts(AddressType::Group, 15, 7, 255));
+        assert_eq!(ga02, Address::from_str("15/7/255").unwrap());
+        assert_eq!(format!("{}", ga02), "15/7/255");
     }
 
     #[test]
@@ -184,17 +184,19 @@ mod tests {
         let ia02 = Address::new(AddressType::Individual, 0xffff);
         assert_eq!(ia02.encode(), [0xff, 0xff]);
         assert_eq!(ia02.as_u16(), 65535);
-
     }
     #[test]
     #[cfg(feature = "std")]
     fn t_knx_individual_address_string() {
-        let ia01 = Address::from_str("1.2.3").unwrap();
-        assert_eq!(ia01, Address::from_parts(AddressType::Individual, 1, 2, 3));
-        assert_eq!(format!("{}", ia01), "1.2.3 (4611)");
+        let ia01 = Address::from_str("6.1.20").unwrap();
+        assert_eq!(ia01, Address::from_parts(AddressType::Individual, 6, 1, 20));
+        assert_eq!(format!("{}", ia01), "6.1.20");
 
-        let ia02 = Address::from_str("15.15.255").unwrap();
-        assert_eq!(ia02, Address::from_parts(AddressType::Individual, 15, 15, 255));
-        assert_eq!(format!("{}", ia02), "15.15.255 (65535)");
+        let ia02 = Address::from_str("15.7.255").unwrap();
+        assert_eq!(
+            ia02,
+            Address::from_parts(AddressType::Individual, 15, 7, 255)
+        );
+        assert_eq!(format!("{}", ia02), "15.7.255");
     }
 }

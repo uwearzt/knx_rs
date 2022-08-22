@@ -1,61 +1,74 @@
 // ------------------------------------------------------------------------------
-// Copyright 2021 Uwe Arzt, mail@uwe-arzt.de
+// Copyright 2021-2022 Uwe Arzt, mail@uwe-arzt.de
 // SPDX-License-Identifier: Apache-2.0
 // ------------------------------------------------------------------------------
 
-// #![feature(alloc_error_handler)]
-// #![no_main]
-// #![no_std]
+use embedded_hal::prelude::_embedded_hal_blocking_delay_DelayMs;
+use linux_embedded_hal::Delay;
+use scd4x::Scd4x;
 
-// use panic_halt as _;
+use linux_embedded_hal::I2cdev;
 
-// use cortex_m_rt::entry;
-// use stm32f4xx_hal as hal;
-
-// use crate::hal::{pac, prelude::*, serial::config::Config, serial::Serial};
-
-// use core::fmt::Write; // for pretty formatting of the serial output
-
-// use knx_rs::address::Address;
-// use knx_rs::address::AddressType;
-
-// #[entry]
-// fn main() -> ! {
-
-//     let dp = pac::Peripherals::take().unwrap();
-//     let cp = cortex_m::peripheral::Peripherals::take().unwrap();
-
-//     let gpioa = dp.GPIOA.split();
-
-//     let rcc = dp.RCC.constrain();
-
-//     let clocks = rcc.cfgr.use_hse(8.mhz()).freeze();
-
-//     let mut delay = hal::delay::Delay::new(cp.SYST, &clocks);
-
-//     // define RX/TX pins
-//     let tx_pin = gpioa.pa2.into_alternate();
-
-//     // configure serial
-//     let mut tx = Serial::tx(
-//         dp.USART2,
-//         tx_pin,
-//         Config::default().baudrate(9600.bps()),
-//         clocks,
-//     )
-//     .unwrap();
-
-//     let mut value: u8 = 0;
-
+use knx_rs::address::{Address, AddressType};
 
 fn main() {
-    let ga01 = Address::new(AddressType::Group, 0x1203);
+    let _ga_temp = Address::from_parts(AddressType::Group, 6, 0, 30);
+    let _ga_hum = Address::from_parts(AddressType::Group, 6, 1, 30);
+    let _ga_co2 = Address::from_parts(AddressType::Group, 6, 2, 30);
+
+    let dev = I2cdev::new("/dev/i2c-1").unwrap();
+    let mut sensor = Scd4x::new(dev, Delay);
+
+    sensor.wake_up();
+    sensor.stop_periodic_measurement().unwrap();
+    sensor.reinit().unwrap();
+
+    let serial = sensor.serial_number().unwrap();
+
+    println!("serial: {:#04x}", serial);
+
+    sensor.start_periodic_measurement().unwrap();
 
     loop {
-        // print some value every 500 ms, value will overflow after 255
-        // writeln!(tx, "value: {:02}\r", value).unwrap();
-        writeln!(tx, "value: {:?}\r", ga01.encode()).unwrap();
-        // value += 1;
-        // delay.delay_ms(500_u32);
+        Delay.delay_ms(5000u16);
+        match sensor.measurement() {
+            Ok(data) => {
+                println!("CO2: {0}, Temperature: {1:#.2} °C, Humidity: {2:#.2} RH",
+                data.co2, data.temperature, data.humidity);
+            }
+            Err(e) =>  {
+                println!("error: {:?}", e);
+            },
+        }
     }
 }
+
+
+// ------------------------------------------------------------------------------
+
+// #![feature(lang_items)]
+// #![no_std]
+// #![no_main]
+
+// extern crate libc;
+// use libc::c_uint;
+// use libc::c_ulong;
+
+// use embedded_hal::prelude::_embedded_hal_blocking_delay_DelayMs;
+// use linux_embedded_hal::Delay;
+// use scd4x::scd4x::Scd4x;
+
+// use linux_embedded_hal::I2cdev;
+
+// use knx_rs::address::{Address, AddressType};
+
+// // used from libc
+// extern {
+//     pub fn printf(format: *const u8, ...) -> i32;
+// }
+
+// #[no_mangle]
+// pub extern "C" fn main(_argc: isize, _argv: *const *const u8) -> isize {
+//     // Since we are passing a C string the final null character is mandatory
+//
+// }

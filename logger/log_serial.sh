@@ -6,4 +6,5 @@
 
 #set -e
 #set -x
-RUST_LOG=debug cargo run --bin logger -- --serial --serialport /dev/cu.usbserial-A403INI8
+#clear; RUST_LOG=debug cargo run --bin logger -- --serial --serialport /dev/cu.usbserial-A403INI8
+clear; RUST_LOG=debug cargo run --bin logger -- --serial --serialport /dev/ttyUSB0 --knxproj /home/uwe/tmp/Haus.knxproj

@@ -1,0 +1,10 @@
+[workspace]
+
+members = [
+    "knx_rs",
+    "knx_macro",
+    "knxproj",
+    "logger",
+    "knx_influxdb",
+    "roomsensor",
+]
