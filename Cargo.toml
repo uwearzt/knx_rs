@@ -6,5 +6,8 @@ members = [
     "knxproj",
     "logger",
     "knx_influxdb",
+]
+
+exclude = [
     "roomsensor",
 ]

@@ -4,12 +4,12 @@
 // ------------------------------------------------------------------------------
 
 use knx_rs::address::Address;
-use knx_rs::dpt::DatapointType;
+use knx_rs::dpt::DPT;
 use minidom::Element;
 use std::fmt;
 use std::fs::File;
 use std::io::Read;
-use std::str::FromStr;
+// use std::str::FromStr;
 
 use std::collections::HashMap;
 
@@ -17,11 +17,11 @@ use std::collections::HashMap;
 pub struct GroupAddress {
     address: knx_rs::address::Address,
     name: String,
-    dpt: knx_rs::dpt::DatapointType,
+    dpt: knx_rs::dpt::DPT,
 }
 impl fmt::Display for GroupAddress {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{} \t {} {}", self.address, self.name, self.dpt)
+        write!(f, "{} \t {} {}", self.address, self.name, self.dpt.dpst())
     }
 }
 #[derive(Debug, PartialEq)]
@@ -39,7 +39,7 @@ pub fn load_knxproj(file: &str) -> Result<KNXproj, u8> {
     let mut file = match archive.by_name("P-0191/0.xml") {
         Ok(file) => file,
         Err(..) => {
-            println!("File P-0191/0.xml");
+            println!("Can not find file P-0191/0.xml");
             return Err(1);
         }
     };
@@ -51,10 +51,16 @@ pub fn load_knxproj(file: &str) -> Result<KNXproj, u8> {
     // let mut map = HashMap::new();
 
     let mut contents = String::new();
-    file.read_to_string(&mut contents).unwrap();
-    // println!("{}", contents);
+    match file.read_to_string(&mut contents) {
+        Ok(i) => println!("read {i} bytes"),
+        Err(e) => { println!("Error reading file {e}"); return Err(1) },
+    }
 
-    let root: Element = contents.parse().unwrap();
+    let root: Element = match contents.parse::<Element>() {
+        Ok(xml) => xml,
+        Err(e) => { println!("Error parsing xml {e}"); return Err(1) },
+    };
+
     let ns = root.ns();
     println!("{}", ns);
 
@@ -101,10 +107,10 @@ pub fn load_knxproj(file: &str) -> Result<KNXproj, u8> {
 
                     let numaddr = addresses.attr("Address").unwrap().parse::<u16>().unwrap();
                     let edpt = match addresses.attr("DatapointType") {
-                        Some(dpt) => DatapointType::from_str(&dpt.replace("-", "_")).unwrap(),
+                        Some(dpt) => DPT::from_dpst(&dpt).unwrap(),
                         None => {
-                            println!("(None) Datatype for {} ", addresses.attr("Name").unwrap());
-                            knx_rs::dpt::DatapointType::DPST_1_1
+                            println!("(None) Datatype for {} using DPT_Bool ", addresses.attr("Name").unwrap());
+                            knx_rs::dpt::DPT::DPT_Bool
                         }
                     };
 

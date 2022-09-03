@@ -5,6 +5,7 @@
 
 #![crate_name = "knx_rs"]
 #![crate_type = "lib"]
+
 #![cfg_attr(not(feature = "std"), no_std)]
 
 #[macro_use]

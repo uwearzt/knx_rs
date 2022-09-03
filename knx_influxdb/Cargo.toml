@@ -11,6 +11,6 @@ edition = "2021"
 [dependencies]
 knx_rs = { path = "../knx_rs" }
 
-influxdb2 ="0.2.0"
+influxdb2 ="0.3.0"
 futures = { version = "0.3.23", default-features = false }
 tokio = { version = "1.20.1", features = ["macros", "rt-multi-thread"] }
