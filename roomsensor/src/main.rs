@@ -7,75 +7,76 @@
 #![feature(type_alias_impl_trait)]
 
 use knx_rs::address::{Address, AddressType};
-use knx_rs::dpt::{DPT};
+use knx_rs::dpt::DPT;
 
 use defmt::*;
 use embassy_executor::Spawner;
-use embassy_stm32::gpio::{Level, Output, Speed};
-use embassy_time::{Duration, Timer};
+// use embassy_stm32::gpio::{Level, Output, Speed};
+use embassy_stm32::dma::NoDma;
+use embassy_stm32::time::Hertz;
+use embassy_time::{Delay, Duration, Timer};
 use {defmt_rtt as _, panic_probe as _};
+
+use embassy_stm32::i2c::I2c;
+use embassy_stm32::interrupt;
+// use embassy_embedded_hal::adapter::BlockingAsync;
+
+use scd4x::Scd4x;
 
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
     let p = embassy_stm32::init(Default::default());
     info!("Hello World!");
 
-    let mut led = Output::new(p.PA5, Level::High, Speed::Low);
+    //let mut led = Output::new(p.PA5, Level::High, Speed::Low);
 
     let _ga_temp = Address::from_parts(AddressType::Group, 6, 0, 30);
     let _dpt = DPT::DPT_Value_Temp;
+
     // let _ga_hum = Address::from_parts(AddressType::Group, 6, 1, 30);
     // let _ga_co2 = Address::from_parts(AddressType::Group, 6, 2, 30);
+
+    let irq = interrupt::take!(I2C3_EV);
+
+    let i2c = I2c::new(
+        p.I2C3,
+        p.PA8,
+        p.PB5,
+        irq,
+        NoDma,
+        NoDma,
+        Hertz(100_000),
+        Default::default(),
+    );
+
+    // let mut i2c = BlockingAsync::new(i2c);
+
+    let mut sensor = Scd4x::new(i2c, Delay);
+    Timer::after(Duration::from_millis(1000)).await;
+
+    match sensor.serial_number() {
+        Ok(serial) => {
+            info!("serial: {:#04x}", serial);
+        }
+        Err(_e) => {
+            error!("could not read serial from SCD40");
+        }
+    }
 
     loop {
-        info!("high");
-        led.set_high();
-        Timer::after(Duration::from_millis(300)).await;
+        Timer::after(Duration::from_millis(5000)).await;
 
-        info!("low");
-        led.set_low();
-        Timer::after(Duration::from_millis(300)).await;
+        match sensor.measurement() {
+            // match sensor.sensor_output() {
+            Ok(data) => {
+                info!(
+                    "CO2: {}, Temperature: {} C, Humidity: {}",
+                    data.co2, data.temperature, data.humidity
+                );
+            }
+            Err(_e) => {
+                info!("error");
+            }
+        }
     }
 }
-
-
-
-// use embedded_hal::prelude::_embedded_hal_blocking_delay_DelayMs;
-// use linux_embedded_hal::Delay;
-// use scd4x::Scd4x;
-
-// use linux_embedded_hal::I2cdev;
-
-// use knx_rs::address::{Address, AddressType};
-
-// fn main() {
-    // let _ga_temp = Address::from_parts(AddressType::Group, 6, 0, 30);
-    // let _ga_hum = Address::from_parts(AddressType::Group, 6, 1, 30);
-    // let _ga_co2 = Address::from_parts(AddressType::Group, 6, 2, 30);
-
-    // let dev = I2cdev::new("/dev/i2c-1").unwrap();
-    // let mut sensor = Scd4x::new(dev, Delay);
-
-    // sensor.wake_up();
-    // sensor.stop_periodic_measurement().unwrap();
-    // sensor.reinit().unwrap();
-
-    // let serial = sensor.serial_number().unwrap();
-
-    // println!("serial: {:#04x}", serial);
-
-    // sensor.start_periodic_measurement().unwrap();
-
-    // loop {
-    //     Delay.delay_ms(5000u16);
-    //     match sensor.measurement() {
-    //         Ok(data) => {
-    //             println!("CO2: {0}, Temperature: {1:#.2} °C, Humidity: {2:#.2} RH",
-    //             data.co2, data.temperature, data.humidity);
-    //         }
-    //         Err(e) =>  {
-    //             println!("error: {:?}", e);
-    //         },
-    //     }
-    // }
-// }
