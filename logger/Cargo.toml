@@ -11,7 +11,8 @@ edition = "2021"
 [dependencies]
 knx_rs = { path = "../knx_rs" }
 knxproj = { path = "../knxproj" }
-clap = { version = "3.2.17", features = ["cargo"] }
+# clap = { version = "3.2.17", features = ["cargo"] }
+clap = { version = "4.0.18", features = ["cargo"] }
 log = "0.4.17"
 log4rs = "1.1.1"
 serial = "0.4.0"

@@ -6,6 +6,5 @@
 
 #set -e
 #set -x
-clear; RUST_LOG=info cargo run --bin logger -- --multicast --knxproj /Users/uwe/tmp/Haus.knxproj
-#clear; RUST_LOG=debug cargo run --bin logger -- --multicast --knxproj /Users/uwe/tmp/Haus.knxproj
-#clear; RUST_LOG=debug cargo run --bin logger -- --multicast --knxproj /home/uwe/tmp/Haus.knxproj
+
+clear; RUST_LOG=info cargo run --bin logger -- --multicast 224.0.23.12:3671 --knxproj /Users/uwe/tmp/Haus.knxproj

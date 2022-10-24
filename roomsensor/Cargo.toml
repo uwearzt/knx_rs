@@ -12,11 +12,11 @@ edition = "2021"
 knx_rs = { path = "../knx_rs", default-features = false }
 knx_macro = { path = "../knx_macro" }
 
-embassy-sync = { path = "../../../rust/embassy/embassy-sync", features = ["defmt"] }
-embassy-executor = { path = "../../../rust/embassy/embassy-executor", features = ["defmt", "integrated-timers"] }
-embassy-time = { path = "../../../rust/embassy/embassy-time", features = ["defmt", "defmt-timestamp-uptime"] }
-embassy-stm32 = { path = "../../../rust/embassy/embassy-stm32", features = ["nightly", "defmt", "time-driver-any", "stm32g431kb", "memory-x", "unstable-pac", "exti"]  }
-embassy-hal-common = { path = "../../../rust/embassy/embassy-hal-common" }
+embassy-sync = { path = "../../embassy/embassy-sync", features = ["defmt"] }
+embassy-executor = { path = "../../embassy/embassy-executor", features = ["defmt", "integrated-timers"] }
+embassy-time = { path = "../../embassy/embassy-time", features = ["defmt", "defmt-timestamp-uptime"] }
+embassy-stm32 = { path = "../../embassy/embassy-stm32", features = ["nightly", "defmt", "time-driver-any", "stm32g431kb", "memory-x", "unstable-pac", "exti"]  }
+embassy-hal-common = { path = "../../embassy/embassy-hal-common" }
 # embassy-embedded-hal = { path = "../../../rust/embassy/embassy-embedded-hal" }
 
 defmt = "0.3"
@@ -30,5 +30,5 @@ futures = { version = "0.3.17", default-features = false, features = ["async-awa
 heapless = { version = "0.7.5", default-features = false }
 
 #scd4x = { git="https://github.com/hauju/scd4x-rs.git", default-features = false }
-#scd4x = { git="https://github.com/hauju/scd4x-rs.git", default-features = false, features = ["defmt"] }
-scd4x = { path = "../../../rust/scd4x-rs", default-features = false, features = ["defmt"] }
+scd4x = { git="https://github.com/hauju/scd4x-rs.git", default-features = false, features = ["defmt"] }
+#scd4x = { path = "../../../rust/scd4x-rs", default-features = false, features = ["defmt"] }

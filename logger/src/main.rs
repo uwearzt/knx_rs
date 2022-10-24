@@ -5,7 +5,7 @@
 
 #[macro_use]
 extern crate clap;
-use clap::{App, Arg};
+use clap::Arg;
 
 use knx_rs::ipheader::ServiceType;
 use knx_rs::parser::parse_cemi;
@@ -27,6 +27,8 @@ use serial;
 use std::net::Ipv4Addr;
 use std::net::SocketAddrV4;
 use std::net::UdpSocket;
+
+use std::path::PathBuf;
 
 use serial::prelude::*;
 use std::io::prelude::*;
@@ -64,7 +66,9 @@ fn main() {
 
     let _handle = log4rs::init_config(config).unwrap();
 
-    let parms = App::new("knx_listen")
+//    let parms = App::new("knx_listen")
+
+    let parms = command!()
         .version(crate_version!())
         .about("listen and log KNX messages serial/multicast")
         .author(crate_authors!())
@@ -82,28 +86,12 @@ fn main() {
                 .conflicts_with("serial")
                 .short('m')
                 .long("multicast")
-                .help("use multicast"),
-        )
-        .arg(
-            Arg::new("serialport")
-                .required(false)
-                .default_value("/dev/cu.usb_to_knx")
-                .short('p')
-                .long("serialport")
-                .help("serial port device"),
-        )
-        .arg(
-            Arg::new("multicast_address")
-                .required(false)
-                .default_value("224.0.23.12:3671")
-                .short('a')
-                .long("multicast_address")
-                .help("multicast address for knx"),
+                .help("use multicast address"),
         )
         .arg(
             Arg::new("knxproj")
                 .required(true)
-                .takes_value(true)
+                .value_parser(value_parser!(PathBuf))
                 .short('k')
                 .long("knxproj")
                 .help("KNX project file exported from ETS"),
@@ -112,19 +100,18 @@ fn main() {
 
     let mut knxproj: Option<KNXproj> = None;
 
-    if parms.is_present("knxproj") {
-        let knxproj_file = parms.value_of("knxproj").unwrap();
+    
+    if let Some(knxproj_file) = parms.get_one::<PathBuf>("knxproj") {
+        println!("Loading from KNX file: {:?}", knxproj_file);
         knxproj = Some(knxproj::load_knxproj(knxproj_file).unwrap());
     }
-    if parms.is_present("serial") {
-        let serial_port = parms.value_of("serialport").unwrap();
-        println!("Listening on serial port: {}", serial_port);
-        knx_listen_serial(serial_port);
+    if let Some(serial) = parms.get_one::<String>("serial") {
+        println!("Listening on serial port: {}", serial);
+        knx_listen_serial(serial);
     }
-    if parms.is_present("multicast") {
-        let multicast_address = parms.value_of("multicast_address").unwrap();
-        println!("Listening on multicast address: {}", multicast_address);
-        knx_listen_multicast(multicast_address, knxproj);
+    if let Some(multicast) = parms.get_one::<String>("multicast") {
+        println!("Listening on multicast address: {}", multicast);
+        knx_listen_multicast(multicast, knxproj);
     }
 }
 

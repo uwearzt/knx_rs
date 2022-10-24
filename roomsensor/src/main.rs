@@ -21,10 +21,22 @@ use embassy_stm32::i2c::I2c;
 use embassy_stm32::interrupt;
 // use embassy_embedded_hal::adapter::BlockingAsync;
 
+use embassy_stm32::usart::Config;
+use embassy_stm32::usart::Uart;
+
 use scd4x::Scd4x;
 
+#[embassy_executor::task]
+async fn test() {
+    loop {
+        info!("hello from test");
+        Timer::after(Duration::from_millis(5000)).await;
+    }
+}
+
+
 #[embassy_executor::main]
-async fn main(_spawner: Spawner) {
+async fn main(spawner: Spawner) {
     let p = embassy_stm32::init(Default::default());
     info!("Hello World!");
 
@@ -62,6 +74,16 @@ async fn main(_spawner: Spawner) {
             error!("could not read serial from SCD40");
         }
     }
+
+    let config = Config::default();
+    let mut usart = Uart::new(p.USART1, p.PA10, p.PA9, NoDma, NoDma, config);
+
+    unwrap!(usart.blocking_write(b"Hello Embassy World!\r\n"));
+    info!("wrote Hello, starting echo");
+
+    unwrap!(spawner.spawn(test()));
+
+    sensor.wake_up();
 
     loop {
         Timer::after(Duration::from_millis(5000)).await;

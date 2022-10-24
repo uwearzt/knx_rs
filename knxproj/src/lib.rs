@@ -9,6 +9,8 @@ use minidom::Element;
 use std::fmt;
 use std::fs::File;
 use std::io::Read;
+
+use std::path::PathBuf;
 // use std::str::FromStr;
 
 use std::collections::HashMap;
@@ -29,9 +31,8 @@ pub struct KNXproj {
     pub group_adresses: HashMap<u16, GroupAddress>,
 }
 
-pub fn load_knxproj(file: &str) -> Result<KNXproj, u8> {
-    let fname = std::path::Path::new(file);
-    let file = File::open(&fname).unwrap();
+pub fn load_knxproj(file: &PathBuf) -> Result<KNXproj, u8> {
+    let file = File::open(&file).unwrap();
 
     let mut archive = zip::ZipArchive::new(file).unwrap();
     println!("Number of files in archive: {}", archive.len());
