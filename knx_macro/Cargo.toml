@@ -1,3 +1,8 @@
+# ------------------------------------------------------------------------------
+# Copyright 2022-2023 Uwe Arzt, mail@uwe-arzt.de
+# SPDX-License-Identifier: Apache-2.0
+# ------------------------------------------------------------------------------
+
 [package]
 name = "knx_macro"
 version = "0.1.0"
@@ -7,7 +12,7 @@ edition = "2021"
 proc-macro = true
 
 [dependencies]
-regex = "1.6.0"
-syn = {version="1.0.99",features=["full", "fold", "extra-traits"]}
-quote = "1.0.21"
-proc-macro2 = "1.0.43"
+regex = "1.7.1"
+syn = {version="1.0.107",features=["full", "fold", "extra-traits"]}
+quote = "1.0.23"
+proc-macro2 = "1.0.50"

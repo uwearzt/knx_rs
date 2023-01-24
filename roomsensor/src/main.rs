@@ -1,5 +1,5 @@
 // ------------------------------------------------------------------------------
-// Copyright 2021-2022 Uwe Arzt, mail@uwe-arzt.de
+// Copyright 2021-2023 Uwe Arzt, mail@uwe-arzt.de
 // SPDX-License-Identifier: Apache-2.0
 // ------------------------------------------------------------------------------
 #![no_std]
@@ -21,7 +21,8 @@ use embassy_stm32::i2c::I2c;
 use embassy_stm32::interrupt;
 // use embassy_embedded_hal::adapter::BlockingAsync;
 
-use embassy_stm32::usart::Config;
+//use embassy_stm32::usart::Config;
+use embassy_stm32::usart::Config as UsartConf;
 use embassy_stm32::usart::Uart;
 
 use scd4x::Scd4x;
@@ -48,12 +49,12 @@ async fn main(spawner: Spawner) {
     // let _ga_hum = Address::from_parts(AddressType::Group, 6, 1, 30);
     // let _ga_co2 = Address::from_parts(AddressType::Group, 6, 2, 30);
 
-    let irq = interrupt::take!(I2C3_EV);
+    let irq = interrupt::take!(I2C1_EV);
 
     let i2c = I2c::new(
-        p.I2C3,
-        p.PA8,
-        p.PB5,
+        p.I2C1,
+        p.PB6,
+        p.PB7,
         irq,
         NoDma,
         NoDma,
@@ -75,8 +76,9 @@ async fn main(spawner: Spawner) {
         }
     }
 
-    let config = Config::default();
-    let mut usart = Uart::new(p.USART1, p.PA10, p.PA9, NoDma, NoDma, config);
+    let config = UsartConf::default();
+    let irq = interrupt::take!(USART2);
+    let mut usart = Uart::new(p.USART2, p.PA3, p.PA2, irq, NoDma, NoDma, config);
 
     unwrap!(usart.blocking_write(b"Hello Embassy World!\r\n"));
     info!("wrote Hello, starting echo");

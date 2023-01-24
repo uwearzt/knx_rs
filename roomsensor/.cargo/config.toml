@@ -1,6 +1,10 @@
-#
+# ------------------------------------------------------------------------------
+# Copyright 2022-2023 Uwe Arzt, mail@uwe-arzt.de
+# SPDX-License-Identifier: Apache-2.0
+# ------------------------------------------------------------------------------
+
 [target.'cfg(all(target_arch = "arm", target_os = "none"))']
-runner = "probe-run --chip STM32G431KBTx"
+runner = "probe-run --chip STM32F411CEUx"
 
 [build]
 target = "thumbv7em-none-eabi"
